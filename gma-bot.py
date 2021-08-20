@@ -5,7 +5,6 @@ import logging
 import telebot
 from dotenv import load_dotenv
 from telebot import types
-from flask import Flask, request
 
 load_dotenv()
 
@@ -14,7 +13,6 @@ logging.basicConfig(filename='log.txt', level=logging.INFO,
 
 KEY = os.getenv('BOT_API_KEY')
 bot = telebot.TeleBot(KEY)
-server = Flask(__name__)
 
 logging.info('<---+--->\nStarting new session')
 
@@ -160,23 +158,4 @@ def d100(message):
     logging.info(f'D100: Someone rolled {dicenum}')
 
 
-@server.route('/' + KEY, methods=['POST'])
-def getMessage():
-    json_string = request.get_data().decode('utf-8')
-    update = telebot.types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return "!", 200
-
-
-@server.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url='https://agile-ridge-16181.herokuapp.com/' + KEY)
-    return "!", 200
-
-
-if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
-
-
-# bot.polling(none_stop=True)
+bot.polling(none_stop=True)
